@@ -37,8 +37,6 @@ preprocess_data <- function(data){
     # Drop original tables
     select(-c(person_education, person_home_ownership, loan_intent))
   
-  
-  
   # rename columns after encoding
   data_encoded <- data_encoded %>%
     rename(

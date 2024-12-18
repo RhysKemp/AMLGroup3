@@ -14,6 +14,7 @@ library(caret)
 
 # MODEL NAME
 model_name <- "decision_tree" # Change for relevant model
+# file name structure should be "model_name_model.rds"
 
 
 

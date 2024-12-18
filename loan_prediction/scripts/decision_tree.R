@@ -40,7 +40,7 @@ fit <- rpart(
     previous_loan_defaults_on_file,
   
   data = train_data, 
-  method = "class"
+  method = "class",
 )
 
 # Save model
