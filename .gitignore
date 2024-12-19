@@ -1,4 +1,23 @@
-.Rproj.user
+# RStudio specific
+.Rproj.user/
 .Rhistory
 .RData
+.Rapp.history
 .Ruserdata
+
+# Compiled files
+*.o
+*.so
+*.dll
+*.dSYM/
+
+# Package manager directories
+renv/
+packrat/
+
+# Log files
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
