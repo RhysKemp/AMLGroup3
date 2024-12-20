@@ -66,13 +66,6 @@ print(summary(data))
 cat("\nData Types of Columns:\n")
 print(sapply(data, class))
 
-# =====================================
-# Unique Values in each column
-# =====================================
-
-cat("\nUnique Values in each column:\n")
-print()
-
 
 # =====================================
 # Notes for Next Steps
