@@ -18,8 +18,6 @@ library(dplyr)
 library(gridExtra)
 library(scales)
 
-
-
 # =====================================
 # Define File Paths
 # =====================================
@@ -53,10 +51,12 @@ histogram_palette_one <- "Dark2"
 create_bar_plot <- function(data, x_column, fill_column = NULL,
                             x_labels = NULL, plot_title = "Bar Plot",
                             x_axis_title = "X-Axis", y_axis_title = "Frequency",
-                            fill_pallette = bar_palette_one ) {
+                            fill_palette = bar_palette_one ) {
   
   # Ensure consistent factor levels for the column
-  data[[x_column]] <- factor(data[[x_column]], levels = unique(data[[x_column]]))
+  if (!is.factor(data[[x_column]])) {
+    data[[x_column]] <- factor(data[[x_column]], levels = unique(data[[x_column]]))
+  }
   
   # fill defaults to x_column
   if (is.null(fill_column)) {
@@ -69,7 +69,7 @@ create_bar_plot <- function(data, x_column, fill_column = NULL,
   }
   
   # Create bar plot
-  bar_plot <- ggplot(data, aes_string(x = x_column, fill = fill_column)) +
+  p <- ggplot(data, aes_string(x = x_column, fill = fill_column)) +
     geom_bar(color = "black", alpha = 1, stat = "count") +
     geom_text(
       aes(label = ..count..), 
@@ -79,9 +79,9 @@ create_bar_plot <- function(data, x_column, fill_column = NULL,
       size = 5
     ) +
     scale_x_discrete(labels = x_labels) +
-    scale_y_continuous(breaks = seq(0, max(table(data[[x_column]])), by = 5000)) +
+    scale_y_continuous(breaks = pretty_breaks(n =5)) +
     scale_fill_brewer(
-      palette = fill_pallette,
+      palette = fill_palette,
       labels = x_labels
       ) +
     labs(
@@ -98,7 +98,7 @@ create_bar_plot <- function(data, x_column, fill_column = NULL,
     ) +
     guides(fill = guide_legend(title = fill_column))
   
-  return(bar_plot)
+  return(p)
 }
 
 # Function to plot a pie chart with set aesthetics and params, has option to show additional information as count, percent or both
@@ -128,7 +128,7 @@ create_pie_plot <- function(data, column, fill_palette = pie_palette_one,
     stop("Invalid label_format. Use 'count', 'percent', or 'both'.")
   }
   
-  pie_plot <- ggplot(column_counts, aes(x = "", y = Count, fill = Category)) +
+  p <- ggplot(column_counts, aes(x = "", y = Count, fill = Category)) +
     geom_bar(width = 1, stat = "identity", color = "black") +
     coord_polar(theta = "y") + # Turn bar chart into pie chart
     scale_fill_brewer(palette = fill_palette) +
@@ -150,7 +150,7 @@ create_pie_plot <- function(data, column, fill_palette = pie_palette_one,
       legend.text = element_text(size = 10)
     )
   
-  return(pie_plot)
+  return(p)
 }
 
 # =====================================
@@ -203,9 +203,7 @@ plot_categorical_distribution(data, "loan_status")
 # =====================================
 
 # List of numerical columns for analysis
-numerical_columns_to_analyse <- c('person_age', 'person_income', 'person_emp_exp', 'loan_amnt', 
-                        'loan_int_rate', 'loan_percent_income', 'cb_person_cred_hist_length', 
-                        'credit_score')
+numerical_columns_to_analyse <- names(data)[sapply(data, is.numeric)]
 
 # Function for univariate analysis on numeric columns
 univariate_analysis_dist_kde <- function(data, columns) {
@@ -214,6 +212,9 @@ univariate_analysis_dist_kde <- function(data, columns) {
   # Loop through each column specified in provided df
   for (i in seq_along(columns)) {
     column <- columns[i]
+    if (column == "loan_status") {
+      next  # Skip this iteration
+    }
     
     # Create histogram with density probability curve 
     p <- ggplot(data, aes_string(x = column)) + 
@@ -234,7 +235,7 @@ univariate_analysis_dist_kde <- function(data, columns) {
         ) +
       # Aesthetics and theme
       scale_y_continuous(labels = comma) +
-      scale_x_continuous(labels = comma, breaks = scales::pretty_breaks(n = 10)) +
+      scale_x_continuous(labels = comma, breaks = pretty_breaks(n = 10)) +
       theme_classic() +
       theme(
         panel.grid.major = element_line(color = "gray90", size = 0.5),
@@ -291,6 +292,9 @@ univariate_analysis_boxplot <- function(data, column) {
 }
 
 for (column in numerical_columns_to_analyse) {
+  if (column == "loan_status") {
+    next  # Skip this iteration
+  }
   univariate_analysis_boxplot(data, column)
 }
 
@@ -300,8 +304,7 @@ for (column in numerical_columns_to_analyse) {
 # =====================================
 
 # List of categorical columns for analysis
-categorical_columns_to_analyse <- c("person_gender", "person_education", "person_home_ownership",
-                                   "loan_intent", "previous_loan_defaults_on_file")
+categorical_columns_to_analyse <- names(data)[!sapply(data, is.numeric)]
 
 for (column in categorical_columns_to_analyse) {
   plot_categorical_distribution(data, column)
