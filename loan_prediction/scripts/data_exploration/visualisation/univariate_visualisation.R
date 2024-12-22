@@ -2,8 +2,10 @@
 # File: univariate_visualisation.R
 # Author: Rhys Kemp - C2471361
 # Institution: Teesside University
-# Purpose: [Brief description of the script's purpose, e.g., data exploration, 
-#           preprocessing, EDA, model training, or evaluation.]
+# Purpose:
+# - Conduct univariate analysis
+# - Create visualisations (bar plots, pie charts, density plots, box plots)
+# - Explore distributions of categorical and numerical variables
 # =====================================
 
 # =====================================
@@ -47,16 +49,14 @@ histogram_palette_one <- "Dark2"
 #  Graph Helper Functions
 # =====================================
 
+# Function to plot a bar chart with set aesthetics and params
 create_bar_plot <- function(data, x_column, fill_column = NULL,
                             x_labels = NULL, plot_title = "Bar Plot",
                             x_axis_title = "X-Axis", y_axis_title = "Frequency",
                             fill_pallette = bar_palette_one ) {
   
-  # Convert columns to factors if necessary
-  data[[x_column]] <- factor(data[[x_column]])
-  if (!is.null(fill_column)) {
-    data[[fill_column]] <- factor(data[[fill_column]])
-  }
+  # Ensure consistent factor levels for the column
+  data[[x_column]] <- factor(data[[x_column]], levels = unique(data[[x_column]]))
   
   # fill defaults to x_column
   if (is.null(fill_column)) {
@@ -79,6 +79,7 @@ create_bar_plot <- function(data, x_column, fill_column = NULL,
       size = 5
     ) +
     scale_x_discrete(labels = x_labels) +
+    scale_y_continuous(breaks = seq(0, max(table(data[[x_column]])), by = 5000)) +
     scale_fill_brewer(
       palette = fill_pallette,
       labels = x_labels
@@ -100,134 +101,101 @@ create_bar_plot <- function(data, x_column, fill_column = NULL,
   return(bar_plot)
 }
 
-# TODO:
-#     - add pie chart helper function
-
+# Function to plot a pie chart with set aesthetics and params, has option to show additional information as count, percent or both
+create_pie_plot <- function(data, column, fill_palette = pie_palette_one, 
+                            plot_title = "Pie Chart", label_format = "percent") {
+  
+  # Aggregate data for column
+  column_counts <- as.data.frame(table(data[[column]]))
+  colnames(column_counts) <- c("Category", "Count")
+  
+  # Ensure consistent factor levels for the column
+  column_counts$Category <- factor(column_counts$Category, levels = unique(data[[column]]))
+  
+  # Calculate percentage
+  column_counts$Percentage <- round(100 * column_counts$Count / sum(column_counts$Count), 1)
+  
+  
+  
+  # Generate labels dependent on input; count, percent or both
+  if (label_format == "count") {
+    column_counts$Label <- paste0(column_counts$Category, "\n(", column_counts$Count, ")")
+  } else if (label_format == "percent") {
+    column_counts$Label <- paste0(column_counts$Category, "\n(", column_counts$Percentage, "%)")
+  } else if (label_format == "both") {
+    column_counts$Label <- paste0(column_counts$Category, "\n(", column_counts$Count, ", ", column_counts$Percentage, "%)")
+  } else {
+    stop("Invalid label_format. Use 'count', 'percent', or 'both'.")
+  }
+  
+  pie_plot <- ggplot(column_counts, aes(x = "", y = Count, fill = Category)) +
+    geom_bar(width = 1, stat = "identity", color = "black") +
+    coord_polar(theta = "y") + # Turn bar chart into pie chart
+    scale_fill_brewer(palette = fill_palette) +
+    labs(
+      title = plot_title,
+      fill = column
+    ) +
+    geom_text(
+      aes(label = Label), 
+      position = position_stack(vjust = 0.5), 
+      color = "white", 
+      size = 5
+    ) +
+    theme_void() +
+    theme(
+      plot.title = element_text(color = "black", size = 16, face = "bold"),
+      legend.background = element_rect(color = "black", linewidth = 1),
+      legend.title = element_text(size = 12, face = "bold", color = "black"),
+      legend.text = element_text(size = 10)
+    )
+  
+  return(pie_plot)
+}
 
 # =====================================
 # Visualise Loan Status
 # =====================================
 
-# Prepare data for pie chart
-loan_status_count <- table(data$loan_status)
-loan_status_percent <- loan_status_count / sum(loan_status_count) * 100
-
-loan_status_df <- data.frame(
-  loan_status = names(loan_status_count),
-  count = as.integer(loan_status_count),
-  percentage = round(as.numeric(loan_status_percent), 1)
-)
-
-b_plot <- create_bar_plot(
-  data = data, 
-  x_column = "loan_status", 
-  x_labels = c("Rejected (0)", "Approved (1)"), 
-  plot_title = "Loan Status Distribution", 
-  x_axis_title = "Loan Status", 
-  y_axis_title = "Frequency"
-)
-
-b_plot <- b_plot +
-  guides(fill = guide_legend(
-    title = "Loan Status", 
-    title.position = "top", 
-    title.theme = element_text(size = 12, face = "bold", color = "black"),
-    label.theme = element_text(size = 10, face = "bold", color = "black")
-  ))
-
-print(b_plot)
-
-
-# TODO:
-#     - Fix y_interval param
-#     - add pie chart for percentage distribution
-#     - refactor all distribution code to utilise
-plot_distribution_column <- function(data, column, y_interval = NULL) {
+# Function to plot a frequency bar chart and a percentage pie char for categorical columns
+plot_categorical_distribution <- function(data, column) {
   
   # Column handling
   column_title <- gsub("_", " ", column)
-  
   
   # Create bar plot
   bar_title <- paste(column_title, "Distribution")
   bar_plot <- create_bar_plot(
     data = data,
-    column,
+    x_column = column,
     x_axis_title = column_title,
     plot_title = bar_title,
+  )
+  bar_plot <- bar_plot +
+    guides(
+      fill = guide_legend(
+        title = "Loan Status", 
+        title.position = "top", 
+        title.theme = element_text(size = 12, face = "bold", color = "black"),
+        label.theme = element_text(size = 10, face = "bold", color = "black")
+      )
     )
   
-  
-  bar_plot <- bar_plot +
-    guides(fill = guide_legend(
-      title = "Loan Status", 
-      title.position = "top", 
-      title.theme = element_text(size = 12, face = "bold", color = "black"),
-      label.theme = element_text(size = 10, face = "bold", color = "black")
-    ))
-  
-  print(bar_plot)
-  
+  # Plot pie chart
+  pie_title = paste(column_title, "Percentage Distribution")
+  pie_plot <- create_pie_plot(
+    data = data,
+    column = column,
+    plot_title = pie_title
+  )
+  pie_plot <- pie_plot +
+    theme(
+      legend.position = "none"
+    )
+  return(grid.arrange(bar_plot, pie_plot, ncol = 2))
 }
 
-plot_distribution_column(data, "loan_amount", 5000)
-
-# Plot Bar chart
-bar_plot <- ggplot(data, aes(x = factor(loan_status), fill = factor(loan_status))) +
-  geom_bar(color = "black", alpha = 1, stat = "count") +
-  geom_text(
-    aes(label = ..count..), 
-    stat = "count", 
-    vjust = -0.5, 
-    color = "black", 
-    size = 5
-  ) +
-  # Aesthetics and theme
-  scale_x_discrete(labels = c("Rejected", "Approved")) +
-  scale_y_continuous(breaks = seq(0, max(table(data$loan_status)), by = 5000)) +
-  scale_fill_brewer(
-    palette = bar_palette_one,
-    labels = c("Rejected (0)", "Approved (1)")
-    ) +
-  labs(
-    title = "Loan Status Distribution",
-    x = "Loan Status",
-    y = "Frequency"
-  ) +
-  theme_classic() +
-  theme(
-    axis.text.x = element_text(angle = 0, hjust = 0.5, face = "bold"),
-    plot.title = element_text(color = "black", size = 16, face = "bold"),
-    legend.background = element_rect(color = "black", linewidth = 1),
-    legend.title = element_text(size = 12, face = "bold", color = "black")
-  ) +
-  guides(fill = guide_legend(title = "Loan Status"))
-
-# Plot Pie Chart
-pie_plot <- ggplot(loan_status_df, aes(x = "", y = percentage, fill = loan_status)) +
-  geom_bar(stat = "identity", width = 1, color = "black") +
-  coord_polar(theta = "y") +  # Turn bar chart into pie chart
-  geom_text(
-    aes(label = paste0(percentage, "%")), 
-    position = position_stack(vjust = 0.5), 
-    color = "white", 
-    size = 5
-  ) +
-  scale_fill_brewer(
-    palette = pie_palette_one,
-    labels = c("Rejected (0)", "Approved (1)")
-    ) +
-  labs(
-    title = "Loan Status Percentage Distribution"
-  ) +
-  theme_void() +
-  theme(
-    plot.title = element_text(color = "black", size = 16, face = "bold"),
-    legend.position = "none",
-  )
-
-# Plot both in a grid
-grid.arrange(bar_plot, pie_plot, ncol = 2)
+plot_categorical_distribution(data, "loan_status")
 
 # =====================================
 # Univariate Analysis for Numeric Columns
@@ -240,7 +208,7 @@ numerical_columns_to_analyse <- c('person_age', 'person_income', 'person_emp_exp
                         'credit_score')
 
 # Function for univariate analysis on numeric columns
-univariate_analysis <- function(data, columns) {
+univariate_analysis_dist_kde <- function(data, columns) {
   plot_list <- list()
   
   # Loop through each column specified in provided df
@@ -281,7 +249,7 @@ univariate_analysis <- function(data, columns) {
 }
 
 
-univariate_analysis(data, numerical_columns_to_analyse)
+univariate_analysis_dist_kde(data, numerical_columns_to_analyse)
 
 # =====================================
 # Univariate Analysis for Numeric Columns
@@ -312,8 +280,8 @@ univariate_analysis_boxplot <- function(data, column) {
       axis.title.x = element_text(size = 10),
       axis.text.y = element_blank(), # remove y values
       axis.ticks.y = element_blank(),
-      panel.grid.major.x = element_line(color = "gray90", size = 0.5), # gridlines only on x axis
-      panel.grid.minor.x = element_line(color = "gray90", size = 0.2),
+      panel.grid.major.x = element_line(color = "gray90", linewidth = 0.5), # gridlines only on x axis
+      panel.grid.minor.x = element_line(color = "gray90", linewidth = 0.2),
     )
   print(p)
   
@@ -335,59 +303,9 @@ for (column in numerical_columns_to_analyse) {
 categorical_columns_to_analyse <- c("person_gender", "person_education", "person_home_ownership",
                                    "loan_intent", "previous_loan_defaults_on_file")
 
-# Function to plot distribution of categorical columns and percentage distribution
-plot_categorical_distribution <- function(data, column) {
-  # Bar plot
-  bar_plot <- ggplot(data, aes(x = factor(.data[[column]]), fill = factor(.data[[column]]))) +
-    geom_bar(
-      stat = "count",
-      color = "black"
-    ) +
-    geom_text(
-      aes(label = ..count..), 
-      stat = "count", 
-      vjust = -0.5, 
-      color = "black", 
-      size = 5
-    ) +
-    labs(
-      title = paste(gsub("_", " ", column), "Distribution"),
-      x = gsub("_", " ", column),
-      y = "Count"
-      ) +
-    scale_fill_brewer(palette = bar_palette_one) +
-    theme_classic() +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
-      plot.title = element_text(size = 14, face = "bold"),
-      axis.title = element_text(size = 12)
-      )
-  print(bar_plot)
-}
- 
 for (column in categorical_columns_to_analyse) {
   plot_categorical_distribution(data, column)
   }
-
-# =====================================
-# 
-# =====================================
-
-# =====================================
-# 
-# =====================================
-
-# =====================================
-# 
-# =====================================
-
-# =====================================
-# 
-# =====================================
-
-# =====================================
-# 
-# =====================================
 
 
 # =====================================
@@ -400,10 +318,12 @@ for (column in categorical_columns_to_analyse) {
 # cat("Output saved to:", output_path, "\n")
 
 # =====================================
-# Notes for Next Steps (Optional)
+# Notes for Next Steps
 # =====================================
-# Add comments or guidance on what this script enables next.
-# Example:
-# - Ensure outputs are reviewed before feeding them into the next phase.
-# - Check for anomalies in the processed data or results.
+# - Examine loan status by categorical variables 
+# - Analyse numeric variables by loan status using density and box plots 
+# - Perform correlation analysis on numeric variables 
+# - Feature engineering based on EDA insights 
+# - Data preprocessing (handle missing values, scale features, encode categorical variables) 
+# - Train and evaluate models iteratively
 # =====================================
