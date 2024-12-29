@@ -66,7 +66,6 @@ print(summary(data))
 cat("\nData Types of Columns:\n")
 print(sapply(data, class))
 
-
 # =====================================
 # Notes for Next Steps
 # =====================================
