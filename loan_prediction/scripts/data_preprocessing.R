@@ -46,9 +46,11 @@ unique(data$person_gender)
 
 # Perform encoding
 data$person_gender <- ifelse(data$person_gender == "male", 1, 0)
+data$previous_loan_defaults_on_file <- ifelse(data$previous_loan_defaults_on_file == "Yes", 1, 0)
 
 # Verify
 cat("Binary encoding for 'person_gender' completed. Unique values in new column:", unique(data$person_gender_binary), "\n")
+cat("Binary encoding for 'previous_loan_defaults_on_file' completed. Unique values in new column:", unique(data$person_gender_binary), "\n")
 
 # =====================================
 # Ordinal Encoding
