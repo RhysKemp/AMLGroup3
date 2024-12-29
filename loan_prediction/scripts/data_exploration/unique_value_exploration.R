@@ -81,7 +81,7 @@ for (col in categorical_cols) {
 }
 
 # =====================================
-# Notes for Next Steps (Optional)
+# Notes for Next Steps
 # =====================================
 # - Exploratory Data Analysis (EDA).
 # - Preprocess categorical data.

@@ -3,8 +3,9 @@
 # Author: Rhys Kemp - C2471361
 # Institution: Teesside University
 # Purpose: 
-#       -
-#       -
+#       - Visualise data across multiple variables for analysis
+#       - Identify outliers and anomalous values in the data
+#       - Prepare for data preprocessing
 # =====================================
 
 # =====================================
@@ -409,32 +410,12 @@ violin_plot_loan_int_rate <- create_violin_plot(
 grid.arrange(violin_plot_loan_amnt, violin_plot_loan_int_rate, ncol = 2)
 
 # =====================================
-# 
+# Notes for Next Steps
 # =====================================
-
-# =====================================
-# 
-# =====================================
-
-# =====================================
-# 
-# =====================================
-
-
-# =====================================
-# Save Results (if applicable)
-# =====================================
-# Save outputs or results to the specified directory.
-# Provide console feedback that the operation completed successfully with the appropriate path displayed.
-# Example:
-# write.csv(output_data, file = output_path, row.names = FALSE)
-# cat("Output saved to:", output_path, "\n")
-
-# =====================================
-# Notes for Next Steps (Optional)
-# =====================================
-# Add comments or guidance on what this script enables next.
-# Example:
-# - Ensure outputs are reviewed before feeding them into the next phase.
-# - Check for anomalies in the processed data or results.
+# - Bivariate visualisations are complete
+# - Preprocessing will be the next step:
+#   - Binary encoding for gender
+#   - Ordinal encoding for education
+#   - One-hot encoding for home ownership and loan intent
+#   - Handle outliers in data specifically age
 # =====================================
