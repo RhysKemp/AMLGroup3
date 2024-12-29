@@ -149,7 +149,7 @@ create_density_plot <- function(data, x_column, fill_column = NULL,
 }
 
 # Helper function to plot a boxplot graph with set aesthetics and params
-create_box_plot <- function(data, x, y = NULL, fill = NULL,
+create_box_plot <- function(data, x, y, fill = NULL,
                             x_labels = NULL, plot_title = "Box Plot", 
                             x_title = "X-Axis", y_title = "Y-Axis",
                             fill_palette = box_palette_one) {
@@ -167,11 +167,6 @@ create_box_plot <- function(data, x, y = NULL, fill = NULL,
   # Ensure fill_column is a factor
   if (!is.null(fill) && !is.factor(data[[fill]])) {
     data[[fill]] <- factor(data[[fill]])
-  }
-  
-  # If Y not provided, univariate
-  if (is.null(y)) {
-    y <- x
   }
   
   ggplot(data, aes(x = .data[[x]], y = .data[[y]], fill = if (!is.null(fill)) .data[[fill]] else NULL)) +
