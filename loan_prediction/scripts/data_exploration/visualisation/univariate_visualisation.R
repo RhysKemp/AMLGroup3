@@ -69,7 +69,7 @@ create_bar_plot <- function(data, x_column, fill_column = NULL,
   }
   
   # Create bar plot
-  p <- ggplot(data, aes_string(x = x_column, fill = fill_column)) +
+  p <- ggplot(data, aes(x = .data[[x_column]], fill = .data[[fill_column]])) +
     geom_bar(color = "black", alpha = 1, stat = "count") +
     geom_text(
       aes(label = ..count..), 
@@ -217,7 +217,7 @@ univariate_analysis_dist_kde <- function(data, columns) {
     }
     
     # Create histogram with density probability curve 
-    p <- ggplot(data, aes_string(x = column)) + 
+    p <- ggplot(data, aes(x = .data[[column]])) + 
       geom_histogram(
         aes(y = ..density..),
         bins = 30,
@@ -260,7 +260,7 @@ univariate_analysis_dist_kde(data, numerical_columns_to_analyse)
 # Function for univariate analysis on numeric columns
 univariate_analysis_boxplot <- function(data, column) {
   # boxplot
-  p <- ggplot(data, aes_string(x = column)) +
+  p <- ggplot(data, aes(x = .data[[column]])) +
     stat_boxplot(geom ="errorbar", width = 0.5) + # whisker endcaps
     geom_boxplot(
       fill = brewer.pal(3, "Set3")[2],
