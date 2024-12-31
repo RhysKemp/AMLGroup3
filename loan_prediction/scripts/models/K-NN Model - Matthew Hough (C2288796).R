@@ -156,7 +156,7 @@ la.subset.n$loan_status <- la.subset$loan_status
 set.seed(123)
 
 # Random selection of 70% data for training
-dat.d <- sample(1:nrow(la.subset.n), size = nrow(la.subset.n) * 0.7, replace = FALSE)
+dat.d <- sample(1:nrow(la.subset.n), size = nrow(la.subset.n) * 0.75, replace = FALSE)
 
 # Splitting data into training and testing sets
 train.la <- la.subset.n[dat.d,]
