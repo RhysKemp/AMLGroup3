@@ -16,7 +16,6 @@ library(ggplot2)
 library(RColorBrewer)
 library(scales)
 library(gridExtra)
-library(grid)
 
 # =====================================
 # Define File Paths
