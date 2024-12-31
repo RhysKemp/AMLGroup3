@@ -2,8 +2,8 @@
 # Load Libraries
 # =====================================
 
-install.packages("class")
-install.packages("ggplot2")
+#install.packages("class")
+#install.packages("ggplot2")
 
 library(class)
 library(ggplot2)
@@ -216,5 +216,8 @@ for (i in 1:30) {
 # Plotting % accuracy to K-Value
 plot (k.optm, type = "b", xlab = "K- Value", ylab = "Accuracy Level")
 
+# =====================================
+# Save Results
+# =====================================
 
-
+saveRDS(knn.mod, file = "models/knn_model.rds")
