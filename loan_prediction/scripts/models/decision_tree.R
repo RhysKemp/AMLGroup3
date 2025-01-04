@@ -1,4 +1,7 @@
 # decision_tree.R
+# this file is just a completion of classification worksheets from labs
+# Kept on file in case we didn't receive decision tree model, ~91% accuracy
+ 
 
 # Load Libs
 library(rpart)

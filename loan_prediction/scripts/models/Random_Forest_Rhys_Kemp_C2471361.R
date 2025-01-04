@@ -44,7 +44,7 @@ data$loan_status <- as.factor(data$loan_status)
 
 # Split dataset
 set.seed(42)
-train_indices <- sample(seq_len(nrow(data)), size = 0.8 * nrow(data))
+train_indices <- sample(seq_len(nrow(data)), size = 0.75 * nrow(data))
 train_data <- data[train_indices, ]
 test_data <- data[-train_indices, ]
 
@@ -66,6 +66,7 @@ cat("Model training completed in:", training_time, "seconds.\n")
 # Evaluate model
 # =====================================
 
+# timer mostly because control inference model was taking a very long time to predict, largely unnecessary 
 start_time <- Sys.time()
 
 # Predict on test data
