@@ -104,6 +104,72 @@ cat("KNN 178 Accuracy:", ACC.178, "%\n")
 table(knn.177, test.la_labels) 
 table(knn.178, test.la_labels)
 
+
+
+
+# =====================================
+# Evaluate Performance Metrics
+# =====================================
+
+# install.packages("caret")
+library(caret)
+
+knn.177 <- factor(knn.177, levels = unique(c(as.character(knn.177), as.character(test.la_labels))))
+test.la_labels <- factor(test.la_labels, levels = unique(c(as.character(knn.177), as.character(test.la_labels))))
+
+# Confusion Matrix for KNN with k = 177
+conf_matrix_177 <- confusionMatrix(knn.177, test.la_labels)
+
+# Extracting Metrics for k = 177
+sensitivity_177 <- conf_matrix_177$byClass["Sensitivity"]
+accuracy_177 <- conf_matrix_177$overall["Accuracy"]
+kappa_177 <- conf_matrix_177$overall["Kappa"]
+
+# Printing Metrics for k = 177
+cat("For k = 177:\n")
+cat("Sensitivity:", sensitivity_177, "\n")
+cat("Accuracy:", accuracy_177, "\n")
+cat("Kappa:", kappa_177, "\n\n")
+
+# Confusion Matrix for KNN with k = 178
+conf_matrix_178 <- confusionMatrix(knn.178, test.la_labels)
+
+# Extracting Metrics for k = 178
+sensitivity_178 <- conf_matrix_178$byClass["Sensitivity"]
+accuracy_178 <- conf_matrix_178$overall["Accuracy"]
+kappa_178 <- conf_matrix_178$overall["Kappa"]
+
+# Printing Metrics for k = 178
+cat("For k = 178:\n")
+cat("Sensitivity:", sensitivity_178, "\n")
+cat("Accuracy:", accuracy_178, "\n")
+cat("Kappa:", kappa_178, "\n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ========================================================
 # K-NN Model Performance Trend with Different K Numbers
 # ========================================================

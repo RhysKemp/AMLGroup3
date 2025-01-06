@@ -1,65 +1,90 @@
-# model_evaluation.R
+# =====================================
+# File: model_evaluation.R
+# Author: Rhys Kemp - C2471361
+# Institution: Teesside University
+# Purpose: 
+#   - Load and run all models
+#   - Evaluate performance of models
+# =====================================
 
-# Load libs
-library(rpart)
+# =====================================
+# Load Libraries
+# =====================================
+
 library(caret)
 
-
-
-
-
-
-
-
-
-# MODEL NAME
-model_name <- "decision_tree" # Change for relevant model
-# file name structure should be "model_name_model.rds"
-
-
-
-
-
-
-
-
-
-
-
-# Load Test data
+# =====================================
+# Define File Paths
+# =====================================
+# Set up project directory and paths for inputs and outputs.
 project_dir <- getwd()
-test_data_path <- file.path(project_dir, "data", "processed", "test_data_processed.csv")
-test_data <- read.csv(test_data_path)
 
-# Load Model
-model_file <- paste0(model_name, "_model.rds")  # Assuming models are saved with this naming convention
-fit <- readRDS(file.path(project_dir, "models", model_file))
-Prediction <- predict(fit, test_data, type = "class")
+# Input files:
+input_path <- file.path(project_dir, "data", "processed", "loan_data_processed.csv")
 
-# Generate confusion matrix and accuracy
-conf_matrix <- table(test_data$loan_status, Prediction)
-accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
+# =====================================
+# Load Dataset
+# =====================================
 
-# Print matrix and accuracy
-cat("Accuracy: ", accuracy * 100, "%\n")
-print(conf_matrix)
+data <- read.csv(input_path)
+cat("Dataset loaded from:", input_path, "\n")
 
-# prepare results
-submit <- data.frame(loan_status = Prediction, accuracy = rep(accuracy, length(Prediction)))
+# =====================================
+# Load Models
+# =====================================
 
-# Define the results folder and file name
-results_folder <- file.path(project_dir, "results")
-if (!dir.exists(results_folder)) {
-  dir.create(results_folder)
+model_path <- file.path(project_dir, "models")
+
+# dt_model <- readRDS(file.path(model_path, "decision_tree_model.rds"))
+knn_model <- readRDS(file.path(model_path, "knn_model.rds"))
+logr_model <- readRDS(file.path(model_path, "logistics_regression_model.rds"))
+rf_model <- readRDS(file.path(model_path, "random_forest_model.rds"))
+
+# =====================================
+# Evaluate models
+# =====================================
+
+eval_model <- function(model, data, tar_var) {
+  predictions <- predict(model, newdata = data)
+  conf_matrix <- confusionMatrix(predictions, data[[tar_var]])
+  return(conf_matrix)
 }
 
-# Dynamic file naming
-accuracy_str <- sprintf("%.2f", accuracy * 100)
-accuracy_str <- gsub("\\.", "_", accuracy_str) 
-timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-file_name <- paste0(model_name, "_predictions_", accuracy_str, "_accuracy_", timestamp, ".csv")
+tar_var <- "loan_status"
 
-# Write to csv
-write.csv(submit, file = file.path(results_folder, file_name), row.names = FALSE)
+# dt_results <- eval_model(dt_model, data, tar_var)
+# print(dt_results)
 
-cat("Prediction results saved to '", file.path(results_folder, file_name), "'.\n")
+knn_results <- eval_model(knn_model, data, tar_var)
+print(dt_results)
+
+logr_results <- eval_model(logr_model, data, tar_var)
+print(dt_results)
+
+rf_results <- eval_model(rf_model, data, tar_var)
+print(dt_results)
+
+# =====================================
+# 
+# =====================================
+
+# =====================================
+# 
+# =====================================
+
+# =====================================
+# 
+# =====================================
+
+# =====================================
+# 
+# =====================================
+
+# =====================================
+# 
+# =====================================
+
+# =====================================
+# 
+# =====================================
+
